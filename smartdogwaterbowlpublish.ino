@@ -17,7 +17,7 @@
 #define GREEN_LED_PIN       D6      // Green LED wired to D6 (aswell as GND)
 #define RED_LED_PIN         D5      // Red LED wired to D5 (aswell as GND)
 #define READING_INTERVAL    1000    // Device will read moisture level every 1 second
-#define PUBLISH_INTERVAL    5000    // Device will publish moisture level every 5 seconds
+#define PUBLISH_INTERVAL    60000   // Device will publish moisture level every minute
 #define BOARD_LED           D7      // Little blue LED om the Argon next to USB jack
 
 // Variables
@@ -92,8 +92,13 @@ void loop() {
             Particle.publish("moisture", "dry");
             lastPublishTime = lastPublishTime + PUBLISH_INTERVAL;
     }
-    moisture = moisturePercentage;  // Publishes moisture variable to be easily read from Particle console
-    delay(READING_INTERVAL);    // Moisture level read every 1 second
+    // ThingSpeak
+    const char * eventName = "thingSpeakMoisturePercentageReading_";
+    // ThingSpeak Channel information
+    unsigned long myChannelNumber =XXXXXXX;
+    const char * myWriteAPIKey = "XXXXXXXXXXXXXXXX";
+    Particle.publish(eventName, "{\"Moisture Percentage\": \"" + String(moisture) + "\", \"key\": \"" + myWriteAPIKey + "\" }", PRIVATE, NO_ACK);
+    delay(PUBLISH_INTERVAL);    // Moisture level read every minute
 }
 
 // Function to return true if the sensor is sensing moisture below 10 % full (as defined at start of code)
